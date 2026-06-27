@@ -2,34 +2,44 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Ping Pong</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+/* ── RESET & BASE ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 :root {
-  --bg:  #0a0a12;
+  --bg:   #0a0a12;
   --court:#0d0d1a;
-  --net: #1e1e3a;
-  --c1:  #00f5d4;
-  --c2:  #f72585;
-  --text:#e0e0ff;
-  --dim: #4a4a7a;
-  --g1:  rgba(0,245,212,.22);
-  --g2:  rgba(247,37,133,.22);
+  --net:  #1e1e3a;
+  --c1:   #00f5d4;
+  --c2:   #f72585;
+  --text: #e0e0ff;
+  --dim:  #4a4a7a;
+  --g1:   rgba(0,245,212,.22);
+  --g2:   rgba(247,37,133,.22);
 }
 
-html, body {
+html {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: 'Segoe UI', system-ui, sans-serif;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
+  position: fixed;
+  width: 100%;
 }
 
+/* ── SCREENS ── */
 .screen {
   position: fixed;
   inset: 0;
@@ -37,63 +47,161 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  padding: 24px;
-  animation: fadeUp .3s ease;
+  gap: 22px;
+  padding: 28px 24px;
+  overflow: hidden;
 }
 .screen.active { display: flex; }
 
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(14px); }
-  to   { opacity:1; transform:none; }
-}
-
-/* ── MENU ── */
-#s-menu h1 {
-  font-size: clamp(2.6rem,12vw,3.8rem);
+/* ── TYPOGRAPHY ── */
+.big-title {
+  font-size: clamp(2.4rem,11vw,3.6rem);
   font-weight: 900;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--c1);
   text-shadow: 0 0 28px var(--g1), 0 0 56px var(--g1);
 }
-#s-menu p {
+.sub {
   color: var(--dim);
-  font-size: .85rem;
+  font-size: .82rem;
   letter-spacing: .1em;
   text-transform: uppercase;
+  text-align: center;
 }
-
-#s-diff h2 {
-  font-size: 1.3rem;
+.section-title {
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--c1);
 }
 
-.btn-col { display:flex; flex-direction:column; gap:14px; width:min(280px,80vw); }
-
+/* ── BUTTONS ── */
+.btn-col { display:flex; flex-direction:column; gap:13px; width:min(290px,82vw); }
 .btn {
   padding: 15px 24px;
   border: 2px solid var(--c1);
   background: transparent;
   color: var(--c1);
-  font-size: 1rem;
+  font-size: .95rem;
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
   border-radius: 8px;
   cursor: pointer;
   touch-action: manipulation;
+  transition: background .12s, color .12s, box-shadow .12s;
 }
-.btn:active { background:var(--c1); color:var(--bg); box-shadow:0 0 24px var(--g1); }
-.btn.alt  { border-color:var(--c2); color:var(--c2); }
-.btn.alt:active { background:var(--c2); color:#fff; box-shadow:0 0 24px var(--g2); }
-.btn.ghost{ border-color:var(--dim); color:var(--dim); font-size:.85rem; }
-.btn.ghost:active { border-color:var(--text); color:var(--text); background:transparent; }
+.btn:active { background:var(--c1); color:var(--bg); box-shadow:0 0 22px var(--g1); }
+.btn.pink  { border-color:var(--c2); color:var(--c2); }
+.btn.pink:active { background:var(--c2); color:#fff; box-shadow:0 0 22px var(--g2); }
+.btn.ghost { border-color:var(--dim); color:var(--dim); font-size:.82rem; }
+.btn.ghost:active { border-color:var(--text); color:var(--text); background:rgba(255,255,255,.05); }
 
-/* ── GAME LAYOUT ── */
+/* ── MENU ── */
+#s-menu .mode-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: min(290px,82vw);
+}
+.mode-card {
+  padding: 18px 20px;
+  border-radius: 10px;
+  border: 2px solid;
+  cursor: pointer;
+  touch-action: manipulation;
+  text-align: left;
+  background: transparent;
+  transition: background .12s, box-shadow .12s;
+}
+.mode-card .mc-title { font-size:1rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.mode-card .mc-sub   { font-size:.72rem; color:var(--dim); margin-top:4px; letter-spacing:.05em; }
+.mode-card.teal { border-color:var(--c1); color:var(--c1); }
+.mode-card.teal:active { background:rgba(0,245,212,.08); box-shadow:0 0 20px var(--g1); }
+.mode-card.pink { border-color:var(--c2); color:var(--c2); }
+.mode-card.pink:active { background:rgba(247,37,133,.08); box-shadow:0 0 20px var(--g2); }
+.mode-card.dim  { border-color:var(--dim); color:var(--text); }
+.mode-card.dim:active { background:rgba(255,255,255,.04); }
+
+/* ── DIFFICULTY ── */
+
+/* ── ONLINE LOBBY ── */
+#s-online { gap: 18px; }
+#s-online .lobby-box {
+  width: min(320px,90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+/* ── CREATE ROOM ── */
+#s-create { gap:16px; }
+.room-code-box {
+  background: rgba(0,245,212,.06);
+  border: 1.5px solid var(--c1);
+  border-radius: 10px;
+  padding: 16px 22px;
+  text-align: center;
+  width: min(300px,88vw);
+}
+.room-code-label { font-size:.68rem; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+.room-code-val   { font-size:2.2rem; font-weight:900; letter-spacing:.25em; color:var(--c1); font-variant-numeric:tabular-nums; }
+
+#qr-wrap {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  display: inline-block;
+  line-height: 0;
+}
+#qr-wrap canvas { border-radius:6px; }
+
+.waiting-dots::after {
+  content: '';
+  display: inline-block;
+  animation: dots 1.4s infinite;
+}
+@keyframes dots {
+  0%  { content:'.'; }
+  33% { content:'..'; }
+  66% { content:'...'; }
+}
+
+/* ── JOIN ROOM ── */
+#s-join { gap:18px; }
+.join-input-row { display:flex; gap:8px; width:min(300px,88vw); }
+#room-input {
+  flex:1;
+  background: rgba(255,255,255,.05);
+  border: 2px solid var(--dim);
+  color: var(--text);
+  font-size:1.6rem;
+  font-weight:800;
+  letter-spacing:.2em;
+  text-align:center;
+  text-transform:uppercase;
+  border-radius:8px;
+  padding:10px 6px;
+  outline:none;
+  -webkit-appearance:none;
+  touch-action: manipulation;
+}
+#room-input:focus { border-color:var(--c1); }
+#room-input::placeholder { color:var(--dim); font-size:1rem; letter-spacing:.1em; }
+
+.status-msg {
+  font-size:.78rem;
+  letter-spacing:.06em;
+  text-align:center;
+  min-height:20px;
+  color:var(--dim);
+}
+.status-msg.err  { color:#ff6b6b; }
+.status-msg.ok   { color:var(--c1); }
+
+/* ── GAME SCREEN ── */
 #s-game {
   justify-content: flex-start;
   gap: 0;
@@ -101,204 +209,258 @@ html, body {
 }
 
 #hud {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px 6px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 2;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 16px 5px;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
 }
-.hud-player { text-align:center; }
+.hud-player { text-align:center; min-width:60px; }
 .hud-name {
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--dim);
-  margin-bottom: 2px;
+  font-size:.62rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:90px;
 }
 .hud-score {
-  font-size: clamp(2rem,9vw,3.2rem);
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+  font-size:clamp(1.8rem,8vw,3rem);
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+  line-height:1;
 }
-#score-l { color:var(--c1); text-shadow:0 0 16px var(--g1); }
-#score-r { color:var(--c2); text-shadow:0 0 16px var(--g2); }
+#score-l { color:var(--c1); text-shadow:0 0 14px var(--g1); }
+#score-r { color:var(--c2); text-shadow:0 0 14px var(--g2); }
+
+#hud-center { display:flex; flex-direction:column; align-items:center; gap:4px; }
 #hud-back {
-  background: none;
-  border: 1.5px solid var(--dim);
-  color: var(--dim);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  touch-action: manipulation;
+  background:none;
+  border:1.5px solid var(--dim);
+  color:var(--dim);
+  font-size:.65rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:5px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  touch-action:manipulation;
 }
 #hud-back:active { border-color:var(--text); color:var(--text); }
+#net-badge {
+  font-size:.55rem;
+  color:var(--dim);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
 
-/* ── PLAY AREA: canvas + touch zones stacked ── */
 #play-area {
-  position: relative;
-  flex-shrink: 0;
-  width: 100%;
+  position:relative;
+  flex-shrink:0;
+  width:100%;
+  touch-action:none;
 }
-
 canvas {
-  display: block;
-  background: var(--court);
-  border-top: 1px solid var(--net);
-  border-bottom: 1px solid var(--net);
-  width: 100%;
+  display:block;
+  background:var(--court);
+  border-top:1px solid var(--net);
+  border-bottom:1px solid var(--net);
+  width:100%;
+  touch-action:none;
 }
 
-/* Left/right drag zones over the canvas */
+/* drag zones */
 #zone-p1, #zone-p2 {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  touch-action: none;
-  /* subtle visual hint */
+  position:absolute;
+  top:0; bottom:0;
+  width:50%;
+  touch-action:none;
 }
-#zone-p1 { left: 0; }
-#zone-p2 { right: 0; }
+#zone-p1 { left:0; }
+#zone-p2 { right:0; }
 
-/* drag hint lines */
-#zone-p1::after, #zone-p2::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--net) 30%, var(--net) 70%, transparent);
-  opacity: .5;
-}
-#zone-p1::after { right: 0; }
-#zone-p2::after { left: 0; display: none; } /* net already in canvas */
-
-/* ── BUTTONS ROW ── */
+/* ── PADDLE BUTTONS ── */
 #paddle-controls {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 16px;
-  flex-shrink: 0;
-  flex: 1;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 14px;
+  flex-shrink:0;
+  flex:1;
+  min-height:72px;
 }
-.paddle-side { display:flex; gap:10px; }
+.paddle-side { display:flex; gap:9px; }
 .pbtn {
-  width: 68px;
-  height: 58px;
-  border: 2px solid var(--net);
-  background: rgba(20,20,40,.8);
-  font-size: 1.5rem;
-  border-radius: 10px;
-  cursor: pointer;
-  touch-action: manipulation;
-  display: flex; align-items:center; justify-content:center;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-  z-index: 3;
+  width:66px;
+  height:54px;
+  border:2px solid var(--net);
+  background:rgba(20,20,40,.8);
+  font-size:1.4rem;
+  border-radius:10px;
+  cursor:pointer;
+  touch-action:manipulation;
+  display:flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+  position:relative; z-index:3;
+  color:var(--dim);
 }
-.pbtn.p1 { color:var(--c1); }
-.pbtn.p2 { color:var(--c2); }
-.pbtn.active.p1 { border-color:var(--c1); background:rgba(0,245,212,.12); }
-.pbtn.active.p2 { border-color:var(--c2); background:rgba(247,37,133,.12); }
+.pbtn.p1-btn { color:var(--c1); }
+.pbtn.p2-btn { color:var(--c2); }
+.pbtn.active.p1-btn { border-color:var(--c1); background:rgba(0,245,212,.12); }
+.pbtn.active.p2-btn { border-color:var(--c2); background:rgba(247,37,133,.12); }
 
-#status {
-  font-size: .68rem;
-  color: var(--dim);
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  text-align: center;
-  flex: 1;
-  padding: 0 6px;
+#status-game {
+  font-size:.62rem;
+  color:var(--dim);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  text-align:center;
+  flex:1;
+  padding:0 4px;
+  line-height:1.4;
 }
 
 /* ── WIN OVERLAY ── */
 #win-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10,10,18,.9);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  z-index: 99;
-  animation: fadeUp .25s ease;
+  position:fixed; inset:0;
+  background:rgba(10,10,18,.9);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  z-index:99;
 }
 #win-overlay.active { display:flex; }
 #win-title {
-  font-size: clamp(2rem,10vw,3.2rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: .12em;
+  font-size:clamp(2rem,10vw,3rem);
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.12em;
 }
-#win-score { color:var(--dim); font-size:1.1rem; letter-spacing:.1em; }
+#win-score { color:var(--dim); font-size:1rem; letter-spacing:.1em; }
 
-/* Drag hint labels on canvas (shown briefly) */
-#drag-hints {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .4s;
+/* ── CONNECTING OVERLAY ── */
+#conn-overlay {
+  position:fixed; inset:0;
+  background:rgba(10,10,18,.94);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  z-index:98;
 }
-#drag-hints.show { opacity: 1; }
-.hint-half {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+#conn-overlay.active { display:flex; }
+#conn-msg { font-size:.9rem; color:var(--c1); letter-spacing:.08em; text-transform:uppercase; }
+
+/* spinner */
+.spinner {
+  width:38px; height:38px;
+  border:3px solid rgba(0,245,212,.15);
+  border-top-color:var(--c1);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
 }
-.hint-half.h1 { color: rgba(0,245,212,.45); }
-.hint-half.h2 { color: rgba(247,37,133,.45); }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── ONLINE WAITING ── */
+#s-waiting { gap:18px; }
 </style>
 </head>
 <body>
 
-<!-- MENU -->
+<!-- ══ SCREEN: MENU ══ -->
 <div id="s-menu" class="screen active">
-  <h1>Ping Pong</h1>
-  <p>Choose mode</p>
-  <div class="btn-col">
-    <button class="btn"     onclick="goMode('ai')">⚡ vs Computer</button>
-    <button class="btn alt" onclick="goMode('2p')">👥 2 Players</button>
+  <div class="big-title">Ping Pong</div>
+  <p class="sub">Choose your mode</p>
+  <div class="mode-cards">
+    <button class="mode-card teal" onclick="goMode('ai')">
+      <div class="mc-title">⚡ vs Computer</div>
+      <div class="mc-sub">Single device · AI opponent</div>
+    </button>
+    <button class="mode-card dim" onclick="goMode('local')">
+      <div class="mc-title">📱 2 Players · Same Phone</div>
+      <div class="mc-sub">Both players on this device</div>
+    </button>
+    <button class="mode-card pink" onclick="goMode('online')">
+      <div class="mc-title">🌐 2 Players · Online</div>
+      <div class="mc-sub">Each player on their own phone</div>
+    </button>
   </div>
 </div>
 
-<!-- DIFFICULTY -->
+<!-- ══ SCREEN: DIFFICULTY ══ -->
 <div id="s-diff" class="screen">
-  <h2>Difficulty</h2>
+  <div class="section-title">Difficulty</div>
   <div class="btn-col">
-    <button class="btn"       onclick="startGame('easy')">🟢 Easy</button>
-    <button class="btn"       onclick="startGame('medium')">🟡 Medium</button>
-    <button class="btn alt"   onclick="startGame('hard')">🔴 Hard</button>
+    <button class="btn"       onclick="startLocalGame('easy')">🟢 Easy</button>
+    <button class="btn"       onclick="startLocalGame('medium')">🟡 Medium</button>
+    <button class="btn pink"  onclick="startLocalGame('hard')">🔴 Hard</button>
     <button class="btn ghost" onclick="show('s-menu')">← Back</button>
   </div>
 </div>
 
-<!-- GAME -->
+<!-- ══ SCREEN: ONLINE LOBBY ══ -->
+<div id="s-online" class="screen">
+  <div class="section-title">Online Multiplayer</div>
+  <div class="lobby-box">
+    <button class="btn" onclick="createRoom()">🏠 Create Room</button>
+    <button class="btn pink" onclick="show('s-join')">🔗 Join Room</button>
+    <button class="btn ghost" onclick="show('s-menu')">← Back</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN: CREATE ROOM ══ -->
+<div id="s-create" class="screen">
+  <div class="section-title">Room Created</div>
+  <div class="room-code-box">
+    <div class="room-code-label">Room Code</div>
+    <div class="room-code-val" id="display-code">----</div>
+  </div>
+  <div id="qr-wrap"><canvas id="qr-canvas"></canvas></div>
+  <p class="sub">Share code or scan QR<br>Waiting for opponent<span class="waiting-dots"></span></p>
+  <button class="btn ghost" onclick="cancelRoom()">← Cancel</button>
+</div>
+
+<!-- ══ SCREEN: JOIN ROOM ══ -->
+<div id="s-join" class="screen">
+  <div class="section-title">Join Room</div>
+  <p class="sub">Enter the 4-letter room code</p>
+  <div class="join-input-row">
+    <input id="room-input" maxlength="4" placeholder="ABCD" autocomplete="off"
+           autocorrect="off" autocapitalize="characters" spellcheck="false"
+           oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
+           onkeydown="if(event.key==='Enter') joinRoom()">
+  </div>
+  <div class="status-msg" id="join-status"></div>
+  <div class="btn-col">
+    <button class="btn pink" onclick="joinRoom()">Join →</button>
+    <button class="btn ghost" onclick="show('s-online')">← Back</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN: GAME ══ -->
 <div id="s-game" class="screen">
   <div id="hud">
     <div class="hud-player">
       <div class="hud-name" id="name-l">Player 1</div>
       <div class="hud-score" id="score-l">0</div>
     </div>
-    <button id="hud-back" onclick="backToMenu()">✕ Menu</button>
-    <div class="hud-player">
+    <div id="hud-center">
+      <button id="hud-back" onclick="quitGame()">✕ Quit</button>
+      <div id="net-badge"></div>
+    </div>
+    <div class="hud-player" style="text-align:right">
       <div class="hud-name" id="name-r">Player 2</div>
       <div class="hud-score" id="score-r">0</div>
     </div>
@@ -306,388 +468,637 @@ canvas {
 
   <div id="play-area">
     <canvas id="c"></canvas>
-    <!-- drag zones sit on top of canvas -->
     <div id="zone-p1"></div>
     <div id="zone-p2"></div>
-    <!-- brief hint overlay -->
-    <div id="drag-hints">
-      <div class="hint-half h1" id="hint1">Drag here<br>Player 1</div>
-      <div class="hint-half h2" id="hint2">Drag here<br>Player 2</div>
-    </div>
   </div>
 
   <div id="paddle-controls">
     <div class="paddle-side">
-      <button class="pbtn p1" id="btn-p1-up">▲</button>
-      <button class="pbtn p1" id="btn-p1-dn">▼</button>
+      <button class="pbtn p1-btn" id="btn-p1-up">▲</button>
+      <button class="pbtn p1-btn" id="btn-p1-dn">▼</button>
     </div>
-    <div id="status">Tap ▲▼ or drag screen to serve</div>
+    <div id="status-game">Tap ▲▼ or drag to serve</div>
     <div class="paddle-side" id="p2-btns">
-      <button class="pbtn p2" id="btn-p2-up">▲</button>
-      <button class="pbtn p2" id="btn-p2-dn">▼</button>
+      <button class="pbtn p2-btn" id="btn-p2-up">▲</button>
+      <button class="pbtn p2-btn" id="btn-p2-dn">▼</button>
     </div>
   </div>
 </div>
 
-<!-- WIN -->
+<!-- ══ WIN OVERLAY ══ -->
 <div id="win-overlay">
   <div id="win-title"></div>
   <div id="win-score"></div>
   <div class="btn-col">
-    <button class="btn"       onclick="replay()">Play Again</button>
-    <button class="btn ghost" onclick="backToMenu()">← Menu</button>
+    <button class="btn" id="replay-btn" onclick="replay()">Play Again</button>
+    <button class="btn ghost" onclick="quitGame()">← Menu</button>
   </div>
 </div>
 
-<script>
-// ─────────────────────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────────────────────
-let mode = 'ai', difficulty = 'medium';
-let scores = [0,0];
-let running = false, waiting = true;
-let rafId = null;
+<!-- ══ CONNECTING OVERLAY ══ -->
+<div id="conn-overlay">
+  <div class="spinner"></div>
+  <div id="conn-msg">Connecting…</div>
+  <button class="btn ghost" style="width:180px;margin-top:8px" onclick="cancelConn()">Cancel</button>
+</div>
 
-const WIN = 7;
+<!-- PeerJS CDN -->
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<!-- QR code generator CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS & HELPERS
+// ═══════════════════════════════════════════════════════════════
+const WIN_SCORE = 7;
 const AI_SPD = { easy:2.0, medium:3.5, hard:6.0 };
 const AI_ERR = { easy:.7,  medium:.35,  hard:.06 };
+const TICK_MS = 1000/60;
 
-const canvas   = document.getElementById('c');
-const ctx      = canvas.getContext('2d');
-const statusEl = document.getElementById('status');
-const hintsEl  = document.getElementById('drag-hints');
-const zoneP1   = document.getElementById('zone-p1');
-const zoneP2   = document.getElementById('zone-p2');
-
-// ─────────────────────────────────────────────────────────────
-// SCREEN ROUTER
-// ─────────────────────────────────────────────────────────────
 function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+function randCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';for(let i=0;i<4;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODE ROUTING
+// ═══════════════════════════════════════════════════════════════
+// gameMode: 'ai' | 'local' | 'online-host' | 'online-guest'
+let gameMode = 'ai';
+let difficulty = 'medium';
 
 function goMode(m) {
-  mode = m;
-  if (m === 'ai') show('s-diff');
-  else startGame(null);
+  if (m === 'ai')     { gameMode='ai';    show('s-diff'); }
+  if (m === 'local')  { gameMode='local'; startLocalGame('medium'); }
+  if (m === 'online') { show('s-online'); }
 }
 
-function backToMenu() {
-  running = false;
-  cancelAnimationFrame(rafId);
-  document.getElementById('win-overlay').classList.remove('active');
-  show('s-menu');
+function startLocalGame(diff) {
+  difficulty = diff;
+  gameMode = gameMode || 'ai';
+  launchGame();
 }
 
-// ─────────────────────────────────────────────────────────────
-// GAME ENTITIES
-// ─────────────────────────────────────────────────────────────
-let p1, p2, ball;
+// ═══════════════════════════════════════════════════════════════
+// ONLINE MULTIPLAYER — PeerJS
+// ═══════════════════════════════════════════════════════════════
+let peer = null;
+let conn = null;
+let roomCode = '';
+let myRole   = '';   // 'host' | 'guest'
 
-function sizeCanvas() {
+// We use PeerJS public STUN/TURN + peer server
+function makePeer(id) {
+  return new Peer(id, {
+    host: '0.peerjs.com',
+    port: 443,
+    path: '/',
+    secure: true,
+    config: {
+      iceServers: [
+        { urls:'stun:stun.l.google.com:19302' },
+        { urls:'stun:stun1.l.google.com:19302' }
+      ]
+    }
+  });
+}
+
+function createRoom() {
+  roomCode = randCode();
+  myRole   = 'host';
+  gameMode = 'online-host';
+
+  show('s-create');
+  document.getElementById('display-code').textContent = roomCode;
+  generateQR();
+  setConnMsg('Waiting for opponent…');
+
+  peer = makePeer('pp-room-' + roomCode);
+
+  peer.on('open', () => {
+    peer.on('connection', c => {
+      conn = c;
+      setupConn();
+      // host sends 'start' after handshake
+    });
+  });
+  peer.on('error', peerErr);
+}
+
+function generateQR() {
+  const el = document.getElementById('qr-canvas');
+  el.innerHTML = '';
+  const url = window.location.href.split('?')[0] + '?join=' + roomCode;
+  // Use QRCode lib
+  try {
+    new QRCode(document.getElementById('qr-wrap'), {
+      text: url,
+      width: 160,
+      height: 160,
+      colorDark:'#000000',
+      colorLight:'#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) { /* lib might not be loaded yet */ }
+}
+
+function cancelRoom() {
+  if (peer) { peer.destroy(); peer=null; }
+  roomCode=''; myRole='';
+  show('s-online');
+}
+
+function joinRoom() {
+  const code = document.getElementById('room-input').value.trim().toUpperCase();
+  if (code.length !== 4) {
+    setJoinStatus('Enter a 4-letter code', 'err'); return;
+  }
+  myRole   = 'guest';
+  gameMode = 'online-guest';
+  roomCode = code;
+  setJoinStatus('Connecting…', 'ok');
+
+  // brief show of connecting overlay
+  showConn('Connecting to room ' + code + '…');
+
+  peer = makePeer('pp-guest-' + randCode() + Date.now());
+  peer.on('open', () => {
+    conn = peer.connect('pp-room-' + code, { reliable:true });
+    conn.on('open', () => {
+      hideConn();
+      setupConn();
+    });
+    conn.on('error', e => { hideConn(); setJoinStatus('Room not found or full', 'err'); });
+  });
+  peer.on('error', e => { hideConn(); setJoinStatus('Connection failed: ' + e.type, 'err'); });
+
+  // timeout
+  setTimeout(()=>{
+    if (gameMode==='online-guest' && (!conn||!conn.open)) {
+      hideConn();
+      setJoinStatus('Could not connect — check the code', 'err');
+      if(peer){peer.destroy();peer=null;}
+    }
+  }, 12000);
+}
+
+function setupConn() {
+  conn.on('data', onNetData);
+  conn.on('close', ()=>{ onPeerDisconnect(); });
+  conn.on('error', ()=>{ onPeerDisconnect(); });
+
+  if (myRole === 'host') {
+    // Tell guest to start as guest; host is P1 (left), guest is P2 (right)
+    conn.send({ type:'start', hostName:'Player 1', guestName:'Player 2' });
+    document.getElementById('name-l').textContent = 'You';
+    document.getElementById('name-r').textContent = 'Opponent';
+    launchGame();
+  } else {
+    // guest waits for 'start'
+    showConn('Waiting for host…');
+  }
+}
+
+function onNetData(data) {
+  if (!data || !data.type) return;
+
+  if (data.type === 'start') {
+    hideConn();
+    document.getElementById('name-l').textContent = 'Opponent';
+    document.getElementById('name-r').textContent = 'You';
+    launchGame();
+    return;
+  }
+
+  if (data.type === 'state') {
+    // Guest receives authoritative game state from host
+    if (gameMode === 'online-guest') {
+      applyNetState(data);
+    }
+    return;
+  }
+
+  if (data.type === 'input') {
+    // Host receives guest paddle Y
+    if (gameMode === 'online-host') {
+      if (p2) p2.y = data.y;
+    }
+    return;
+  }
+
+  if (data.type === 'point') {
+    if (gameMode === 'online-guest') {
+      scores[0] = data.s0;
+      scores[1] = data.s1;
+      updateHUD();
+      if (data.end) { showWin(data.winner); return; }
+      applyNetState(data.state);
+    }
+    return;
+  }
+
+  if (data.type === 'replay') {
+    if (gameMode === 'online-guest') {
+      scores=[0,0]; updateHUD();
+      applyNetState(data.state);
+      running=true; waiting=true;
+      statusGameEl.textContent='Opponent will serve…';
+      document.getElementById('win-overlay').classList.remove('active');
+    }
+    return;
+  }
+
+  if (data.type === 'quit') {
+    onPeerDisconnect();
+  }
+}
+
+function applyNetState(s) {
+  if (!s) return;
+  if (ball && s.ball) {
+    ball.x=s.ball.x; ball.y=s.ball.y;
+    ball.vx=s.ball.vx; ball.vy=s.ball.vy;
+    ball.trail=s.ball.trail||[];
+  }
+  if (p1 && s.p1) p1.y=s.p1;
+  if (p2 && s.p2) p2.y=s.p2;
+  if (typeof s.waiting==='boolean') {
+    waiting=s.waiting;
+    if(waiting) statusGameEl.textContent='Opponent will serve…';
+  }
+}
+
+function netSend(obj) {
+  if (conn && conn.open) { try{conn.send(obj);}catch(e){} }
+}
+
+function onPeerDisconnect() {
+  if (!running && !document.getElementById('s-game').classList.contains('active')) return;
+  running=false;
+  alert('Opponent disconnected.');
+  quitGame();
+}
+
+function cancelConn() {
+  if(peer){peer.destroy();peer=null;}
+  conn=null;
+  hideConn();
+  show('s-online');
+}
+
+function showConn(msg) {
+  document.getElementById('conn-msg').textContent = msg||'Connecting…';
+  document.getElementById('conn-overlay').classList.add('active');
+}
+function hideConn() {
+  document.getElementById('conn-overlay').classList.remove('active');
+}
+function setJoinStatus(msg,cls='') {
+  const el=document.getElementById('join-status');
+  el.textContent=msg; el.className='status-msg '+(cls||'');
+}
+function setConnMsg(m){document.getElementById('conn-msg').textContent=m;}
+function peerErr(e) { alert('Network error: '+e.type); cancelRoom(); }
+
+// Auto-join from URL ?join=CODE
+(function checkURLJoin(){
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get('join');
+  if(code && code.length===4){
+    document.getElementById('room-input').value=code.toUpperCase();
+    show('s-join');
+    setTimeout(joinRoom,300);
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// GAME ENGINE
+// ═══════════════════════════════════════════════════════════════
+const canvas   = document.getElementById('c');
+const ctx      = canvas.getContext('2d');
+const statusGameEl = document.getElementById('status-game');
+
+let p1=null, p2=null, ball=null;
+let scores=[0,0];
+let running=false, waiting=true;
+let rafId=null, lastTs=0;
+
+// held keys
+const held={p1up:false,p1dn:false,p2up:false,p2dn:false};
+
+function sizeCanvas(){
   const hudH  = document.getElementById('hud').offsetHeight;
   const ctrlH = document.getElementById('paddle-controls').offsetHeight;
-  const W = window.innerWidth;
-  const H = Math.max(window.innerHeight - hudH - ctrlH, 180);
-  canvas.width  = W;
-  canvas.height = H;
-  document.getElementById('play-area').style.height = H + 'px';
+  const W=window.innerWidth;
+  const H=Math.max(window.innerHeight-hudH-ctrlH, 160);
+  canvas.width=W; canvas.height=H;
+  document.getElementById('play-area').style.height=H+'px';
 }
 
-function initEntities() {
-  const W = canvas.width, H = canvas.height;
-  const pw = Math.max(8,  W * 0.025);
-  const ph = Math.max(50, H * 0.22);
-  p1 = { x: W*0.025,        y:(H-ph)/2, w:pw, h:ph };
-  p2 = { x: W-W*0.025-pw,   y:(H-ph)/2, w:pw, h:ph };
+function initEntities(){
+  const W=canvas.width,H=canvas.height;
+  const pw=Math.max(8,W*0.025), ph=Math.max(48,H*0.22);
+  p1={x:W*0.025,      y:(H-ph)/2, w:pw, h:ph};
+  p2={x:W-W*0.025-pw, y:(H-ph)/2, w:pw, h:ph};
   spawnBall();
 }
 
-function spawnBall() {
-  const W = canvas.width, H = canvas.height;
-  const spd = W * 0.007;
-  const ang = (0.2 + Math.random()*0.6) * Math.PI * (Math.random()<.5?1:-1);
-  ball = {
-    x:W/2, y:H/2,
-    r: Math.max(7, W*0.018),
-    vx: spd * Math.cos(ang) * (Math.random()<.5?1:-1),
-    vy: spd * Math.sin(ang),
-    trail: []
+function spawnBall(){
+  const W=canvas.width,H=canvas.height;
+  const spd=W*0.007;
+  const ang=(0.2+Math.random()*0.6)*Math.PI*(Math.random()<.5?1:-1);
+  ball={
+    x:W/2,y:H/2,
+    r:Math.max(7,W*0.018),
+    vx:spd*Math.cos(ang)*(Math.random()<.5?1:-1),
+    vy:spd*Math.sin(ang),
+    trail:[]
   };
-  waiting = true;
-  statusEl.textContent = 'Tap ▲▼ or drag screen to serve';
+  waiting=true;
+
+  const isOnline = gameMode==='online-host'||gameMode==='online-guest';
+  if(isOnline && gameMode==='online-guest'){
+    statusGameEl.textContent='Opponent will serve…';
+  } else {
+    statusGameEl.textContent='Tap ▲▼ or drag to serve';
+  }
 }
 
-function startGame(diff) {
-  difficulty = diff || 'medium';
-  scores = [0,0];
-  document.getElementById('name-l').textContent = 'Player 1';
-  document.getElementById('name-r').textContent = mode==='ai' ? 'Computer' : 'Player 2';
-  updateHUD();
+function launchGame(){
+  scores=[0,0]; updateHUD();
 
-  // P2 buttons only in 2P mode
-  document.getElementById('p2-btns').style.visibility = mode==='2p' ? 'visible' : 'hidden';
-  // P2 drag zone only in 2P mode
-  zoneP2.style.pointerEvents = mode==='2p' ? 'all' : 'none';
+  // configure paddle buttons & zones visibility
+  const p2BtnsEl=document.getElementById('p2-btns');
+  const zoneP2El=document.getElementById('zone-p2');
+  const zoneP1El=document.getElementById('zone-p1');
+  const netBadge=document.getElementById('net-badge');
 
-  // Hint labels
-  document.getElementById('hint1').innerHTML = 'Drag here<br>Player 1';
-  document.getElementById('hint2').innerHTML = mode==='2p' ? 'Drag here<br>Player 2' : '';
+  if(gameMode==='online-host'){
+    p2BtnsEl.style.visibility='hidden';
+    zoneP2El.style.pointerEvents='none';
+    netBadge.textContent='🌐 Online · Host';
+    document.getElementById('name-l').textContent='You (P1)';
+    document.getElementById('name-r').textContent='Opponent';
+  } else if(gameMode==='online-guest'){
+    // Guest controls right paddle (p2), which appears on right half
+    // but since game is mirrored we keep same canvas; guest sends Y to host
+    p2BtnsEl.style.visibility='visible';
+    zoneP1El.style.pointerEvents='none'; // guest doesn't control p1
+    zoneP2El.style.pointerEvents='all';
+    netBadge.textContent='🌐 Online · Guest';
+    document.getElementById('name-l').textContent='Opponent';
+    document.getElementById('name-r').textContent='You (P2)';
+  } else if(gameMode==='local'){
+    p2BtnsEl.style.visibility='visible';
+    zoneP2El.style.pointerEvents='all';
+    zoneP1El.style.pointerEvents='all';
+    netBadge.textContent='';
+  } else {
+    // ai
+    p2BtnsEl.style.visibility='hidden';
+    zoneP2El.style.pointerEvents='none';
+    zoneP1El.style.pointerEvents='all';
+    netBadge.textContent='';
+  }
 
   show('s-game');
-
-  requestAnimationFrame(() => {
+  requestAnimationFrame(()=>{
     sizeCanvas();
     initEntities();
-    running = true;
-    waiting = true;
-    // Show drag hints briefly
-    hintsEl.classList.add('show');
-    setTimeout(() => hintsEl.classList.remove('show'), 2000);
+    running=true;
+    waiting=true;
+    cancelAnimationFrame(rafId);
     loop();
   });
 }
 
-function replay() {
+function quitGame(){
+  running=false;
+  cancelAnimationFrame(rafId);
+  if(conn){ netSend({type:'quit'}); conn.close(); conn=null; }
+  if(peer){ peer.destroy(); peer=null; }
   document.getElementById('win-overlay').classList.remove('active');
-  scores = [0,0];
-  updateHUD();
-  sizeCanvas();
-  initEntities();
-  running = true;
-  waiting = true;
+  hideConn();
+  // reset QR wrap
+  const qrWrap=document.getElementById('qr-wrap');
+  qrWrap.innerHTML='<canvas id="qr-canvas"></canvas>';
+  show('s-menu');
+}
+
+function replay(){
+  document.getElementById('win-overlay').classList.remove('active');
+  scores=[0,0]; updateHUD();
+  sizeCanvas(); initEntities();
+  running=true; waiting=true;
+
+  if(gameMode==='online-host'){
+    // tell guest to reset
+    netSend({type:'replay', state:getNetState()});
+  }
+  cancelAnimationFrame(rafId);
   loop();
 }
 
-function updateHUD() {
-  document.getElementById('score-l').textContent = scores[0];
-  document.getElementById('score-r').textContent = scores[1];
+function updateHUD(){
+  document.getElementById('score-l').textContent=scores[0];
+  document.getElementById('score-r').textContent=scores[1];
 }
 
-// ─────────────────────────────────────────────────────────────
-// INPUT — BUTTONS (hold)
-// ─────────────────────────────────────────────────────────────
-const held = { p1up:false, p1dn:false, p2up:false, p2dn:false };
-
-function bindBtn(id, key) {
-  const el = document.getElementById(id);
-  const on  = e => { e.preventDefault(); held[key]=true;  el.classList.add('active');    serve(); };
-  const off = e => { e.preventDefault(); held[key]=false; el.classList.remove('active'); };
-  el.addEventListener('touchstart',  on,  { passive:false });
-  el.addEventListener('touchend',    off, { passive:false });
-  el.addEventListener('touchcancel', off, { passive:false });
-  el.addEventListener('mousedown',   on);
-  el.addEventListener('mouseup',     off);
-  el.addEventListener('mouseleave',  off);
+// ── SERVE ──
+function serve(){
+  if(!running||!waiting) return;
+  // online guest can't serve — only host can
+  if(gameMode==='online-guest') return;
+  waiting=false;
+  const isOnline=gameMode==='online-host';
+  statusGameEl.textContent = isOnline
+    ? 'Drag your side to move'
+    : (gameMode==='local' ? 'P1: left | P2: right' : 'Drag or tap ▲▼');
 }
 
-bindBtn('btn-p1-up','p1up');
-bindBtn('btn-p1-dn','p1dn');
-bindBtn('btn-p2-up','p2up');
-bindBtn('btn-p2-dn','p2dn');
-
-// ─────────────────────────────────────────────────────────────
-// INPUT — DRAG on play area (finger follows paddle)
-// ─────────────────────────────────────────────────────────────
-// Track active touches per zone: touchId → lastY
-const dragP1 = new Map(); // touchId → lastY
-const dragP2 = new Map();
-
-function getCanvasY(clientY) {
-  const rect = canvas.getBoundingClientRect();
-  return (clientY - rect.top) * (canvas.height / rect.height);
-}
-
-function setupDragZone(zone, dragMap, getPaddle) {
-  zone.addEventListener('touchstart', e => {
-    e.preventDefault();
-    serve();
-    for (const t of e.changedTouches) {
-      dragMap.set(t.identifier, getCanvasY(t.clientY));
-    }
-  }, { passive:false });
-
-  zone.addEventListener('touchmove', e => {
-    e.preventDefault();
-    for (const t of e.changedTouches) {
-      if (!dragMap.has(t.identifier)) continue;
-      const prevY = dragMap.get(t.identifier);
-      const currY = getCanvasY(t.clientY);
-      const delta = currY - prevY;
-      const pad   = getPaddle();
-      if (pad) {
-        pad.y = clamp(pad.y + delta, 0, canvas.height - pad.h);
-      }
-      dragMap.set(t.identifier, currY);
-    }
-  }, { passive:false });
-
-  zone.addEventListener('touchend', e => {
-    for (const t of e.changedTouches) dragMap.delete(t.identifier);
-  }, { passive:false });
-
-  zone.addEventListener('touchcancel', e => {
-    for (const t of e.changedTouches) dragMap.delete(t.identifier);
-  }, { passive:false });
-}
-
-setupDragZone(zoneP1, dragP1, () => p1);
-setupDragZone(zoneP2, dragP2, () => mode==='2p' ? p2 : null);
-
-// ─────────────────────────────────────────────────────────────
-// SERVE
-// ─────────────────────────────────────────────────────────────
-function serve() {
-  if (!running || !waiting) return;
-  waiting = false;
-  statusEl.textContent = mode==='ai'
-    ? 'Buttons ▲▼ or drag left side'
-    : 'P1: left side  |  P2: right side';
-}
-
-// ─────────────────────────────────────────────────────────────
-// GAME LOOP
-// ─────────────────────────────────────────────────────────────
-let lastTs = 0;
-
-function loop(ts=0) {
-  if (!running) return;
-  const dt = Math.min((ts - lastTs) / 16.67, 3);
-  lastTs = ts;
-  if (!waiting) update(dt);
+// ── LOOP ──
+function loop(ts=0){
+  if(!running) return;
+  const dt=Math.min((ts-lastTs)/16.67,3);
+  lastTs=ts;
+  if(!waiting) update(dt);
   draw();
-  rafId = requestAnimationFrame(loop);
+  rafId=requestAnimationFrame(loop);
 }
 
-// ─────────────────────────────────────────────────────────────
-// UPDATE
-// ─────────────────────────────────────────────────────────────
-function update(dt) {
-  const W = canvas.width, H = canvas.height;
-  const spd = Math.max(4, W * 0.012) * dt;
+// ── UPDATE ──
+let netSendTimer=0;
+function update(dt){
+  const W=canvas.width,H=canvas.height;
+  const spd=Math.max(4,W*0.012)*dt;
 
-  // P1 buttons
-  if (held.p1up) p1.y -= spd;
-  if (held.p1dn) p1.y += spd;
-  p1.y = clamp(p1.y, 0, H - p1.h);
-
-  // P2 buttons (2P only) — drag is handled live in touchmove
-  if (mode === '2p') {
-    if (held.p2up) p2.y -= spd;
-    if (held.p2dn) p2.y += spd;
-    p2.y = clamp(p2.y, 0, H - p2.h);
-  } else {
-    // AI
-    const aiSpd = AI_SPD[difficulty] * (W/360) * dt;
-    const target = ball.y - p2.h/2 + (Math.random()-.5) * H * AI_ERR[difficulty];
-    p2.y += clamp(target - p2.y, -aiSpd, aiSpd);
-    p2.y = clamp(p2.y, 0, H - p2.h);
+  // ── ONLINE GUEST: only move p2, send to host ──
+  if(gameMode==='online-guest'){
+    if(held.p2up) p2.y-=spd;
+    if(held.p2dn) p2.y+=spd;
+    p2.y=clamp(p2.y,0,H-p2.h);
+    // send p2 position every ~2 frames
+    netSendTimer+=dt;
+    if(netSendTimer>1.8){ netSend({type:'input',y:p2.y}); netSendTimer=0; }
+    // ball & p1 come from host via net
+    return;
   }
 
-  // Ball trail
-  ball.trail.push({ x:ball.x, y:ball.y });
-  if (ball.trail.length > 7) ball.trail.shift();
+  // ── LOCAL / AI / HOST controls ──
 
-  // Move ball
-  ball.x += ball.vx * dt;
-  ball.y += ball.vy * dt;
+  // P1 always controlled locally (ai host or local p1)
+  if(held.p1up) p1.y-=spd;
+  if(held.p1dn) p1.y+=spd;
+  p1.y=clamp(p1.y,0,H-p1.h);
 
-  // Wall bounce
-  if (ball.y - ball.r < 0)  { ball.y = ball.r;      ball.vy =  Math.abs(ball.vy); }
-  if (ball.y + ball.r > H)  { ball.y = H - ball.r;  ball.vy = -Math.abs(ball.vy); }
+  // P2 controls
+  if(gameMode==='local'){
+    if(held.p2up) p2.y-=spd;
+    if(held.p2dn) p2.y+=spd;
+    p2.y=clamp(p2.y,0,H-p2.h);
+  } else if(gameMode==='ai'){
+    const aiSpd=AI_SPD[difficulty]*(W/360)*dt;
+    const target=ball.y-p2.h/2+(Math.random()-.5)*H*AI_ERR[difficulty];
+    p2.y+=clamp(target-p2.y,-aiSpd,aiSpd);
+    p2.y=clamp(p2.y,0,H-p2.h);
+  }
+  // online-host: p2.y set from guest input messages (done in onNetData)
 
-  // Paddle collisions
-  if (ball.vx < 0 && hits(ball, p1)) bounce(p1, 'right');
-  if (ball.vx > 0 && hits(ball, p2)) bounce(p2, 'left');
+  // ball trail
+  ball.trail.push({x:ball.x,y:ball.y});
+  if(ball.trail.length>7) ball.trail.shift();
 
-  // Score
-  if (ball.x + ball.r < 0) { addPoint(1); return; }
-  if (ball.x - ball.r > W) { addPoint(0); return; }
+  // move ball
+  ball.x+=ball.vx*dt;
+  ball.y+=ball.vy*dt;
+
+  // walls
+  if(ball.y-ball.r<0) {ball.y=ball.r; ball.vy=Math.abs(ball.vy);}
+  if(ball.y+ball.r>H) {ball.y=H-ball.r; ball.vy=-Math.abs(ball.vy);}
+
+  // paddles
+  if(ball.vx<0 && hits(ball,p1)) bounce(p1,'right');
+  if(ball.vx>0 && hits(ball,p2)) bounce(p2,'left');
+
+  // score
+  let scored=-1;
+  if(ball.x+ball.r<0) scored=1;
+  if(ball.x-ball.r>W) scored=0;
+  if(scored>=0){ addPoint(scored); return; }
+
+  // host: broadcast state every ~3 frames
+  if(gameMode==='online-host'){
+    netSendTimer+=dt;
+    if(netSendTimer>2.5){
+      netSend({type:'state',...getNetState()});
+      netSendTimer=0;
+    }
+  }
 }
 
-function hits(b, p) {
-  return b.x - b.r < p.x + p.w &&
-         b.x + b.r > p.x &&
-         b.y       > p.y &&
-         b.y       < p.y + p.h;
+function getNetState(){
+  return {
+    ball:{x:ball.x,y:ball.y,vx:ball.vx,vy:ball.vy,trail:ball.trail},
+    p1:p1.y, p2:p2.y, waiting
+  };
 }
 
-function bounce(pad, dir) {
-  const rel = (ball.y - (pad.y + pad.h/2)) / (pad.h/2);
-  const ang = rel * (Math.PI/3.2);
-  const spd = Math.min(Math.hypot(ball.vx, ball.vy) * 1.05, canvas.width * 0.016);
-  ball.vx = (dir==='right' ? 1 : -1) * spd * Math.cos(ang);
-  ball.vy = spd * Math.sin(ang);
+function hits(b,p){
+  return b.x-b.r<p.x+p.w && b.x+b.r>p.x && b.y>p.y && b.y<p.y+p.h;
 }
-
-function addPoint(who) {
+function bounce(pad,dir){
+  const rel=(ball.y-(pad.y+pad.h/2))/(pad.h/2);
+  const ang=rel*(Math.PI/3.2);
+  const spd=Math.min(Math.hypot(ball.vx,ball.vy)*1.05,canvas.width*0.016);
+  ball.vx=(dir==='right'?1:-1)*spd*Math.cos(ang);
+  ball.vy=spd*Math.sin(ang);
+}
+function addPoint(who){
   scores[who]++;
   updateHUD();
-  if (scores[who] >= WIN) { endGame(who); return; }
+  const ended=scores[who]>=WIN_SCORE;
+  if(gameMode==='online-host'){
+    netSend({type:'point',s0:scores[0],s1:scores[1],end:ended,winner:who,state:getNetState()});
+  }
+  if(ended){ showWin(who); return; }
   spawnBall();
 }
 
-function endGame(who) {
-  running = false;
-  const name  = who===0 ? 'Player 1' : (mode==='ai' ? 'Computer' : 'Player 2');
-  const color = who===0 ? 'var(--c1)' : 'var(--c2)';
-  const t = document.getElementById('win-title');
-  t.textContent = name + ' Wins!';
-  t.style.color = color;
-  document.getElementById('win-score').textContent = `${scores[0]} – ${scores[1]}`;
+function showWin(who){
+  running=false;
+  let name;
+  if(gameMode==='online-host')  name=who===0?'You':'Opponent';
+  else if(gameMode==='online-guest') name=who===1?'You':'Opponent';
+  else name=who===0?'Player 1':(gameMode==='ai'?'Computer':'Player 2');
+
+  const color=who===0?'var(--c1)':'var(--c2)';
+  const t=document.getElementById('win-title');
+  t.textContent=name+' Wins!'; t.style.color=color;
+  document.getElementById('win-score').textContent=scores[0]+' – '+scores[1];
   document.getElementById('win-overlay').classList.add('active');
+
+  // guests can't replay alone
+  if(gameMode==='online-guest')
+    document.getElementById('replay-btn').style.display='none';
+  else
+    document.getElementById('replay-btn').style.display='';
 }
 
-// ─────────────────────────────────────────────────────────────
-// DRAW
-// ─────────────────────────────────────────────────────────────
-function draw() {
-  const W = canvas.width, H = canvas.height;
+// ── DRAW ──
+function draw(){
+  const W=canvas.width,H=canvas.height;
   ctx.clearRect(0,0,W,H);
 
-  // Net
-  ctx.setLineDash([H*.045, H*.04]);
+  // net
+  ctx.setLineDash([H*.045,H*.04]);
   ctx.strokeStyle='#1e1e3a'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Centre circle
+  // centre circle
   ctx.strokeStyle='#181830'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.arc(W/2,H/2,H*.1,0,Math.PI*2); ctx.stroke();
 
-  // Trail
-  ball.trail.forEach((pt,i) => {
-    const a = (i/ball.trail.length)*.28;
-    const r = ball.r*(i/ball.trail.length)*.75;
+  // trail
+  ball.trail.forEach((pt,i)=>{
+    const a=(i/ball.trail.length)*.28, r=ball.r*(i/ball.trail.length)*.75;
     ctx.beginPath(); ctx.arc(pt.x,pt.y,r,0,Math.PI*2);
     ctx.fillStyle=`rgba(0,245,212,${a})`; ctx.fill();
   });
 
-  // Ball
-  const g = ctx.createRadialGradient(ball.x-ball.r*.3,ball.y-ball.r*.3,ball.r*.08,ball.x,ball.y,ball.r);
-  g.addColorStop(0,'#ffffff'); g.addColorStop(1,'#00f5d4');
+  // ball
+  const g=ctx.createRadialGradient(ball.x-ball.r*.3,ball.y-ball.r*.3,ball.r*.08,ball.x,ball.y,ball.r);
+  g.addColorStop(0,'#fff'); g.addColorStop(1,'#00f5d4');
   ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
   ctx.fillStyle=g; ctx.shadowColor='#00f5d4'; ctx.shadowBlur=20;
   ctx.fill(); ctx.shadowBlur=0;
 
-  // Paddles
+  // paddles
   drawPaddle(p1,'#00f5d4','#002e28');
   drawPaddle(p2,'#f72585','#2e0018');
 
-  // Serve overlay
-  if (waiting) {
+  // serve overlay
+  if(waiting){
     ctx.fillStyle='rgba(0,0,0,.52)';
     ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#00f5d4';
-    ctx.font=`bold ${Math.max(14,W*.042)}px system-ui`;
+    ctx.font=`bold ${Math.max(13,W*.038)}px system-ui`;
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('Tap ▲▼ or drag to serve', W/2, H/2);
+    const msg=gameMode==='online-guest'?'Waiting for opponent to serve…':'Tap ▲▼ or drag to serve';
+    ctx.fillText(msg,W/2,H/2);
   }
 }
 
-function drawPaddle(p, stroke, fill) {
-  const r = p.w*.55;
+function drawPaddle(p,stroke,fill){
+  const r=p.w*.55;
   ctx.shadowColor=stroke; ctx.shadowBlur=16;
   ctx.fillStyle=fill;
   ctx.beginPath(); rrect(ctx,p.x-2,p.y-2,p.w+4,p.h+4,r+2); ctx.fill();
@@ -695,20 +1106,77 @@ function drawPaddle(p, stroke, fill) {
   ctx.beginPath(); rrect(ctx,p.x,p.y,p.w,p.h,r); ctx.fill();
   ctx.shadowBlur=0;
 }
-
-function rrect(c,x,y,w,h,r) {
-  c.moveTo(x+r,y); c.lineTo(x+w-r,y);
-  c.quadraticCurveTo(x+w,y,x+w,y+r); c.lineTo(x+w,y+h-r);
-  c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h);
-  c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r);
-  c.quadraticCurveTo(x,y,x+r,y);
+function rrect(c,x,y,w,h,r){
+  c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);
+  c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);
+  c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);
 }
 
-function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+// ═══════════════════════════════════════════════════════════════
+// INPUT — BUTTONS
+// ═══════════════════════════════════════════════════════════════
+function bindBtn(id,key){
+  const el=document.getElementById(id);
+  const on =e=>{e.preventDefault();held[key]=true; el.classList.add('active');   serve();};
+  const off=e=>{e.preventDefault();held[key]=false;el.classList.remove('active');};
+  el.addEventListener('touchstart', on, {passive:false});
+  el.addEventListener('touchend',   off,{passive:false});
+  el.addEventListener('touchcancel',off,{passive:false});
+  el.addEventListener('mousedown',  on);
+  el.addEventListener('mouseup',    off);
+  el.addEventListener('mouseleave', off);
+}
+bindBtn('btn-p1-up','p1up');
+bindBtn('btn-p1-dn','p1dn');
+bindBtn('btn-p2-up','p2up');
+bindBtn('btn-p2-dn','p2dn');
 
-window.addEventListener('resize', () => {
-  if (running) { sizeCanvas(); }
-});
+// ═══════════════════════════════════════════════════════════════
+// INPUT — DRAG ZONES
+// ═══════════════════════════════════════════════════════════════
+const dragP1=new Map(), dragP2=new Map();
+
+function getCanvasY(clientY){
+  const rect=canvas.getBoundingClientRect();
+  return (clientY-rect.top)*(canvas.height/rect.height);
+}
+
+function setupDrag(zoneId,dragMap,getPad,canServe){
+  const zone=document.getElementById(zoneId);
+  zone.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(canServe()) serve();
+    for(const t of e.changedTouches) dragMap.set(t.identifier,getCanvasY(t.clientY));
+  },{passive:false});
+  zone.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    for(const t of e.changedTouches){
+      if(!dragMap.has(t.identifier)) continue;
+      const prev=dragMap.get(t.identifier);
+      const curr=getCanvasY(t.clientY);
+      const pad=getPad();
+      if(pad) pad.y=clamp(pad.y+(curr-prev),0,canvas.height-pad.h);
+      dragMap.set(t.identifier,curr);
+    }
+  },{passive:false});
+  zone.addEventListener('touchend',   e=>{for(const t of e.changedTouches)dragMap.delete(t.identifier);},{passive:false});
+  zone.addEventListener('touchcancel',e=>{for(const t of e.changedTouches)dragMap.delete(t.identifier);},{passive:false});
+}
+
+// zone-p1: controls p1 for ai/local/host; nothing for guest
+setupDrag('zone-p1',dragP1,()=>{
+  if(gameMode==='online-guest') return null;
+  return p1;
+},()=>gameMode!=='online-guest');
+
+// zone-p2: controls p2 for local/guest; nothing for ai/host
+setupDrag('zone-p2',dragP2,()=>{
+  if(gameMode==='local'||gameMode==='online-guest') return p2;
+  return null;
+},()=>false); // right zone never triggers serve
+
+window.addEventListener('resize',()=>{ if(running) sizeCanvas(); });
 </script>
 </body>
 </html>
