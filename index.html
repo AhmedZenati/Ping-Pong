@@ -5,653 +5,710 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Ping Pong</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-  :root {
-    --bg: #0a0a12;
-    --court: #0d0d1a;
-    --net: #1e1e3a;
-    --accent: #00f5d4;
-    --accent2: #f72585;
-    --text: #e0e0ff;
-    --dim: #4a4a7a;
-    --glow: rgba(0,245,212,0.25);
-  }
+:root {
+  --bg:  #0a0a12;
+  --court:#0d0d1a;
+  --net: #1e1e3a;
+  --c1:  #00f5d4;
+  --c2:  #f72585;
+  --text:#e0e0ff;
+  --dim: #4a4a7a;
+  --g1:  rgba(0,245,212,.22);
+  --g2:  rgba(247,37,133,.22);
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    touch-action: none;
-  }
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
 
-  /* ── MENU ── */
-  #menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 28px;
-    animation: fadeIn .4s ease;
-  }
-  #menu h1 {
-    font-size: clamp(2.4rem, 8vw, 4rem);
-    font-weight: 900;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    text-shadow: 0 0 30px var(--glow), 0 0 60px var(--glow);
-  }
-  #menu p.subtitle {
-    color: var(--dim);
-    font-size: .95rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-  .btn-group { display: flex; flex-direction: column; gap: 14px; width: 260px; }
-  .btn {
-    padding: 14px 28px;
-    border: 2px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background .18s, color .18s, box-shadow .18s;
-  }
-  .btn:hover, .btn:active {
-    background: var(--accent);
-    color: var(--bg);
-    box-shadow: 0 0 22px var(--glow);
-  }
-  .btn.secondary {
-    border-color: var(--dim);
-    color: var(--dim);
-  }
-  .btn.secondary:hover {
-    border-color: var(--accent2);
-    background: var(--accent2);
-    color: #fff;
-    box-shadow: 0 0 22px rgba(247,37,133,.3);
-  }
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  animation: fadeUp .3s ease;
+}
+.screen.active { display: flex; }
 
-  /* ── DIFFICULTY ── */
-  #diff-screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 22px;
-    animation: fadeIn .3s ease;
-  }
-  #diff-screen h2 {
-    font-size: 1.4rem;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:none; }
+}
 
-  /* ── GAME ── */
-  #game { display: none; flex-direction: column; align-items: center; width: 100%; }
+/* ── MENU ── */
+#s-menu h1 {
+  font-size: clamp(2.6rem,12vw,3.8rem);
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--c1);
+  text-shadow: 0 0 28px var(--g1), 0 0 56px var(--g1);
+}
+#s-menu p {
+  color: var(--dim);
+  font-size: .85rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
 
-  #hud {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: min(600px, 98vw);
-    padding: 10px 4px 8px;
-  }
-  .player-label {
-    font-size: .75rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--dim);
-  }
-  .score {
-    font-size: clamp(1.8rem, 6vw, 3rem);
-    font-weight: 900;
-    font-variant-numeric: tabular-nums;
-  }
-  .score.left  { color: var(--accent); text-shadow: 0 0 18px var(--glow); }
-  .score.right { color: var(--accent2); text-shadow: 0 0 18px rgba(247,37,133,.4); }
-  #hud-mid { text-align: center; }
-  #hud-mid .divider { color: var(--dim); font-size: 1.2rem; }
+#s-diff h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--c1);
+}
 
-  canvas {
-    display: block;
-    border-radius: 4px;
-    background: var(--court);
-    border: 1px solid var(--net);
-    box-shadow: 0 0 40px rgba(0,0,0,.6), inset 0 0 60px rgba(0,245,212,.03);
-    touch-action: none;
-    max-width: 98vw;
-  }
+.btn-col { display:flex; flex-direction:column; gap:14px; width:min(280px,80vw); }
 
-  /* ── MOBILE CONTROLS ── */
-  #touch-controls {
-    display: none;
-    justify-content: space-between;
-    width: min(600px, 98vw);
-    gap: 10px;
-    margin-top: 12px;
-  }
-  .touch-side { display: flex; gap: 8px; }
-  .touch-btn {
-    width: 56px;
-    height: 48px;
-    border: 2px solid var(--net);
-    background: rgba(30,30,58,.7);
-    color: var(--dim);
-    font-size: 1.3rem;
-    border-radius: 8px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    transition: border-color .15s, color .15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .touch-btn:active, .touch-btn.pressed {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(0,245,212,.08);
-  }
-  .touch-btn.right-btn:active, .touch-btn.right-btn.pressed {
-    border-color: var(--accent2);
-    color: var(--accent2);
-    background: rgba(247,37,133,.08);
-  }
+.btn {
+  padding: 15px 24px;
+  border: 2px solid var(--c1);
+  background: transparent;
+  color: var(--c1);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.btn:active { background:var(--c1); color:var(--bg); box-shadow:0 0 24px var(--g1); }
+.btn.alt  { border-color:var(--c2); color:var(--c2); }
+.btn.alt:active { background:var(--c2); color:#fff; box-shadow:0 0 24px var(--g2); }
+.btn.ghost{ border-color:var(--dim); color:var(--dim); font-size:.85rem; }
+.btn.ghost:active { border-color:var(--text); color:var(--text); background:transparent; }
 
-  #status-bar {
-    margin-top: 10px;
-    font-size: .78rem;
-    color: var(--dim);
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    height: 18px;
-  }
+/* ── GAME LAYOUT ── */
+#s-game {
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0;
+}
 
-  /* ── OVERLAY ── */
-  #overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(10,10,18,.88);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    z-index: 10;
-    animation: fadeIn .25s ease;
-  }
-  #overlay h2 {
-    font-size: clamp(1.8rem, 7vw, 3rem);
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-  }
-  #overlay p { color: var(--dim); font-size: .9rem; letter-spacing: .06em; }
-  #overlay .btn-group { width: 220px; }
+#hud {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px 6px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.hud-player { text-align:center; }
+.hud-name {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 2px;
+}
+.hud-score {
+  font-size: clamp(2rem,9vw,3.2rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+#score-l { color:var(--c1); text-shadow:0 0 16px var(--g1); }
+#score-r { color:var(--c2); text-shadow:0 0 16px var(--g2); }
+#hud-back {
+  background: none;
+  border: 1.5px solid var(--dim);
+  color: var(--dim);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+#hud-back:active { border-color:var(--text); color:var(--text); }
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* ── PLAY AREA: canvas + touch zones stacked ── */
+#play-area {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+}
 
-  @media (max-width: 480px) {
-    #touch-controls { display: flex; }
-  }
+canvas {
+  display: block;
+  background: var(--court);
+  border-top: 1px solid var(--net);
+  border-bottom: 1px solid var(--net);
+  width: 100%;
+}
+
+/* Left/right drag zones over the canvas */
+#zone-p1, #zone-p2 {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  touch-action: none;
+  /* subtle visual hint */
+}
+#zone-p1 { left: 0; }
+#zone-p2 { right: 0; }
+
+/* drag hint lines */
+#zone-p1::after, #zone-p2::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--net) 30%, var(--net) 70%, transparent);
+  opacity: .5;
+}
+#zone-p1::after { right: 0; }
+#zone-p2::after { left: 0; display: none; } /* net already in canvas */
+
+/* ── BUTTONS ROW ── */
+#paddle-controls {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  flex-shrink: 0;
+  flex: 1;
+}
+.paddle-side { display:flex; gap:10px; }
+.pbtn {
+  width: 68px;
+  height: 58px;
+  border: 2px solid var(--net);
+  background: rgba(20,20,40,.8);
+  font-size: 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+  display: flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 3;
+}
+.pbtn.p1 { color:var(--c1); }
+.pbtn.p2 { color:var(--c2); }
+.pbtn.active.p1 { border-color:var(--c1); background:rgba(0,245,212,.12); }
+.pbtn.active.p2 { border-color:var(--c2); background:rgba(247,37,133,.12); }
+
+#status {
+  font-size: .68rem;
+  color: var(--dim);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: center;
+  flex: 1;
+  padding: 0 6px;
+}
+
+/* ── WIN OVERLAY ── */
+#win-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,18,.9);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 99;
+  animation: fadeUp .25s ease;
+}
+#win-overlay.active { display:flex; }
+#win-title {
+  font-size: clamp(2rem,10vw,3.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+#win-score { color:var(--dim); font-size:1.1rem; letter-spacing:.1em; }
+
+/* Drag hint labels on canvas (shown briefly) */
+#drag-hints {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s;
+}
+#drag-hints.show { opacity: 1; }
+.hint-half {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.hint-half.h1 { color: rgba(0,245,212,.45); }
+.hint-half.h2 { color: rgba(247,37,133,.45); }
 </style>
 </head>
 <body>
 
-<!-- ── MENU ── -->
-<div id="menu">
+<!-- MENU -->
+<div id="s-menu" class="screen active">
   <h1>Ping Pong</h1>
-  <p class="subtitle">Choose your mode</p>
-  <div class="btn-group">
-    <button class="btn" onclick="startMode('ai')">⚡ vs Computer</button>
-    <button class="btn secondary" onclick="showDiff()">🎮 2 Players</button>
+  <p>Choose mode</p>
+  <div class="btn-col">
+    <button class="btn"     onclick="goMode('ai')">⚡ vs Computer</button>
+    <button class="btn alt" onclick="goMode('2p')">👥 2 Players</button>
   </div>
 </div>
 
-<!-- ── DIFFICULTY ── -->
-<div id="diff-screen">
-  <h2>Select Difficulty</h2>
-  <div class="btn-group">
-    <button class="btn" onclick="startMode('ai','easy')">Easy</button>
-    <button class="btn" onclick="startMode('ai','medium')">Medium</button>
-    <button class="btn secondary" onclick="startMode('ai','hard')">Hard</button>
+<!-- DIFFICULTY -->
+<div id="s-diff" class="screen">
+  <h2>Difficulty</h2>
+  <div class="btn-col">
+    <button class="btn"       onclick="startGame('easy')">🟢 Easy</button>
+    <button class="btn"       onclick="startGame('medium')">🟡 Medium</button>
+    <button class="btn alt"   onclick="startGame('hard')">🔴 Hard</button>
+    <button class="btn ghost" onclick="show('s-menu')">← Back</button>
   </div>
-  <button class="btn secondary" style="width:260px;margin-top:4px" onclick="backToMenu()">← Back</button>
 </div>
 
-<!-- ── GAME ── -->
-<div id="game">
+<!-- GAME -->
+<div id="s-game" class="screen">
   <div id="hud">
-    <div>
-      <div class="player-label" id="label-left">Player 1</div>
-      <div class="score left" id="score-left">0</div>
+    <div class="hud-player">
+      <div class="hud-name" id="name-l">Player 1</div>
+      <div class="hud-score" id="score-l">0</div>
     </div>
-    <div id="hud-mid">
-      <div class="divider">:</div>
-    </div>
-    <div style="text-align:right">
-      <div class="player-label" id="label-right">Player 2</div>
-      <div class="score right" id="score-right">0</div>
+    <button id="hud-back" onclick="backToMenu()">✕ Menu</button>
+    <div class="hud-player">
+      <div class="hud-name" id="name-r">Player 2</div>
+      <div class="hud-score" id="score-r">0</div>
     </div>
   </div>
 
-  <canvas id="c"></canvas>
-
-  <div id="touch-controls">
-    <div class="touch-side">
-      <button class="touch-btn" id="p1up">▲</button>
-      <button class="touch-btn" id="p1dn">▼</button>
-    </div>
-    <div class="touch-side">
-      <button class="touch-btn right-btn" id="p2up">▲</button>
-      <button class="touch-btn right-btn" id="p2dn">▼</button>
+  <div id="play-area">
+    <canvas id="c"></canvas>
+    <!-- drag zones sit on top of canvas -->
+    <div id="zone-p1"></div>
+    <div id="zone-p2"></div>
+    <!-- brief hint overlay -->
+    <div id="drag-hints">
+      <div class="hint-half h1" id="hint1">Drag here<br>Player 1</div>
+      <div class="hint-half h2" id="hint2">Drag here<br>Player 2</div>
     </div>
   </div>
 
-  <div id="status-bar">Tap canvas or press Space to start</div>
+  <div id="paddle-controls">
+    <div class="paddle-side">
+      <button class="pbtn p1" id="btn-p1-up">▲</button>
+      <button class="pbtn p1" id="btn-p1-dn">▼</button>
+    </div>
+    <div id="status">Tap ▲▼ or drag screen to serve</div>
+    <div class="paddle-side" id="p2-btns">
+      <button class="pbtn p2" id="btn-p2-up">▲</button>
+      <button class="pbtn p2" id="btn-p2-dn">▼</button>
+    </div>
+  </div>
 </div>
 
-<!-- ── OVERLAY ── -->
-<div id="overlay">
-  <h2 id="overlay-title"></h2>
-  <p id="overlay-sub"></p>
-  <div class="btn-group">
-    <button class="btn" onclick="restartGame()">Play Again</button>
-    <button class="btn secondary" onclick="backToMenu()">Menu</button>
+<!-- WIN -->
+<div id="win-overlay">
+  <div id="win-title"></div>
+  <div id="win-score"></div>
+  <div class="btn-col">
+    <button class="btn"       onclick="replay()">Play Again</button>
+    <button class="btn ghost" onclick="backToMenu()">← Menu</button>
   </div>
 </div>
 
 <script>
-// ── GLOBALS ──────────────────────────────────────────────────
-const canvas = document.getElementById('c');
-const ctx    = canvas.getContext('2d');
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let mode = 'ai', difficulty = 'medium';
+let scores = [0,0];
+let running = false, waiting = true;
+let rafId = null;
 
-const WIN_SCORE = 7;
-const PADDLE_SPEED = 6;
+const WIN = 7;
+const AI_SPD = { easy:2.0, medium:3.5, hard:6.0 };
+const AI_ERR = { easy:.7,  medium:.35,  hard:.06 };
 
-let mode = 'ai';
-let difficulty = 'medium';
-let scores = [0, 0];
-let gameRunning = false;
-let paused = false;
-let waiting = true; // waiting for serve
+const canvas   = document.getElementById('c');
+const ctx      = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+const hintsEl  = document.getElementById('drag-hints');
+const zoneP1   = document.getElementById('zone-p1');
+const zoneP2   = document.getElementById('zone-p2');
 
-// Difficulty AI speeds
-const AI_SPEEDS = { easy: 2.8, medium: 4.2, hard: 6.8 };
-const AI_ERRS   = { easy: .7, medium: .4, hard: .12 };
-
-// ── RESIZE ───────────────────────────────────────────────────
-function resize() {
-  const maxW = Math.min(600, window.innerWidth * 0.98);
-  const h = Math.min(maxW * 0.6, window.innerHeight * 0.52);
-  canvas.width  = Math.floor(maxW);
-  canvas.height = Math.floor(h);
-  initPositions();
+// ─────────────────────────────────────────────────────────────
+// SCREEN ROUTER
+// ─────────────────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-// ── STATE ────────────────────────────────────────────────────
-let ball, p1, p2;
-let keys = {};
-let touchKeys = {};
-
-function initPositions() {
-  const W = canvas.width, H = canvas.height;
-  const ph = H * 0.22, pw = W * 0.022;
-
-  p1 = p1 || {};
-  p2 = p2 || {};
-  p1.w = pw; p1.h = ph;
-  p2.w = pw; p2.h = ph;
-  p1.x = W * 0.025;
-  p2.x = W - W * 0.025 - pw;
-  if (!p1.y) p1.y = (H - ph) / 2;
-  if (!p2.y) p2.y = (H - ph) / 2;
-
-  if (!ball) resetBall();
+function goMode(m) {
+  mode = m;
+  if (m === 'ai') show('s-diff');
+  else startGame(null);
 }
 
-function resetBall() {
+function backToMenu() {
+  running = false;
+  cancelAnimationFrame(rafId);
+  document.getElementById('win-overlay').classList.remove('active');
+  show('s-menu');
+}
+
+// ─────────────────────────────────────────────────────────────
+// GAME ENTITIES
+// ─────────────────────────────────────────────────────────────
+let p1, p2, ball;
+
+function sizeCanvas() {
+  const hudH  = document.getElementById('hud').offsetHeight;
+  const ctrlH = document.getElementById('paddle-controls').offsetHeight;
+  const W = window.innerWidth;
+  const H = Math.max(window.innerHeight - hudH - ctrlH, 180);
+  canvas.width  = W;
+  canvas.height = H;
+  document.getElementById('play-area').style.height = H + 'px';
+}
+
+function initEntities() {
   const W = canvas.width, H = canvas.height;
-  const speed = W * 0.007;
-  const angle = (Math.random() * 0.6 + 0.2) * Math.PI * (Math.random() < .5 ? 1 : -1);
+  const pw = Math.max(8,  W * 0.025);
+  const ph = Math.max(50, H * 0.22);
+  p1 = { x: W*0.025,        y:(H-ph)/2, w:pw, h:ph };
+  p2 = { x: W-W*0.025-pw,   y:(H-ph)/2, w:pw, h:ph };
+  spawnBall();
+}
+
+function spawnBall() {
+  const W = canvas.width, H = canvas.height;
+  const spd = W * 0.007;
+  const ang = (0.2 + Math.random()*0.6) * Math.PI * (Math.random()<.5?1:-1);
   ball = {
-    x: W / 2, y: H / 2,
-    r: W * 0.014,
-    vx: speed * Math.cos(angle) * (Math.random() < .5 ? 1 : -1),
-    vy: speed * Math.sin(angle),
+    x:W/2, y:H/2,
+    r: Math.max(7, W*0.018),
+    vx: spd * Math.cos(ang) * (Math.random()<.5?1:-1),
+    vy: spd * Math.sin(ang),
     trail: []
   };
   waiting = true;
+  statusEl.textContent = 'Tap ▲▼ or drag screen to serve';
 }
 
-// ── MENUS ────────────────────────────────────────────────────
-function show(id) {
-  ['menu','diff-screen','game'].forEach(i => {
-    document.getElementById(i).style.display = 'none';
-  });
-  document.getElementById(id).style.display = 'flex';
-}
-
-function showDiff() { show('diff-screen'); }
-
-function backToMenu() {
-  cancelAnimationFrame(rafId);
-  gameRunning = false;
-  document.getElementById('overlay').style.display = 'none';
-  show('menu');
-}
-
-function startMode(m, diff) {
-  mode = m;
+function startGame(diff) {
   difficulty = diff || 'medium';
   scores = [0,0];
-  p1 = null; p2 = null; ball = null;
-
-  // Labels
-  document.getElementById('label-left').textContent = 'Player 1';
-  document.getElementById('label-right').textContent = mode === 'ai' ? 'Computer' : 'Player 2';
-
-  // Touch controls: show p2 side only in 2P mode
-  const tc = document.getElementById('touch-controls');
-  const p2side = document.querySelector('.touch-side:last-child');
-  if (mode === 'ai') {
-    p2side.style.visibility = 'hidden';
-  } else {
-    p2side.style.visibility = 'visible';
-  }
-
+  document.getElementById('name-l').textContent = 'Player 1';
+  document.getElementById('name-r').textContent = mode==='ai' ? 'Computer' : 'Player 2';
   updateHUD();
-  show('game');
-  resize();
-  gameRunning = true;
-  waiting = true;
-  document.getElementById('status-bar').textContent = 'Tap or press Space to serve';
-  loop();
+
+  // P2 buttons only in 2P mode
+  document.getElementById('p2-btns').style.visibility = mode==='2p' ? 'visible' : 'hidden';
+  // P2 drag zone only in 2P mode
+  zoneP2.style.pointerEvents = mode==='2p' ? 'all' : 'none';
+
+  // Hint labels
+  document.getElementById('hint1').innerHTML = 'Drag here<br>Player 1';
+  document.getElementById('hint2').innerHTML = mode==='2p' ? 'Drag here<br>Player 2' : '';
+
+  show('s-game');
+
+  requestAnimationFrame(() => {
+    sizeCanvas();
+    initEntities();
+    running = true;
+    waiting = true;
+    // Show drag hints briefly
+    hintsEl.classList.add('show');
+    setTimeout(() => hintsEl.classList.remove('show'), 2000);
+    loop();
+  });
 }
 
-function restartGame() {
-  document.getElementById('overlay').style.display = 'none';
+function replay() {
+  document.getElementById('win-overlay').classList.remove('active');
   scores = [0,0];
-  p1 = null; p2 = null; ball = null;
   updateHUD();
-  resize();
-  gameRunning = true;
+  sizeCanvas();
+  initEntities();
+  running = true;
   waiting = true;
-  document.getElementById('status-bar').textContent = 'Tap or press Space to serve';
   loop();
 }
 
 function updateHUD() {
-  document.getElementById('score-left').textContent  = scores[0];
-  document.getElementById('score-right').textContent = scores[1];
+  document.getElementById('score-l').textContent = scores[0];
+  document.getElementById('score-r').textContent = scores[1];
 }
 
-// ── GAME LOOP ─────────────────────────────────────────────────
-let rafId;
+// ─────────────────────────────────────────────────────────────
+// INPUT — BUTTONS (hold)
+// ─────────────────────────────────────────────────────────────
+const held = { p1up:false, p1dn:false, p2up:false, p2dn:false };
+
+function bindBtn(id, key) {
+  const el = document.getElementById(id);
+  const on  = e => { e.preventDefault(); held[key]=true;  el.classList.add('active');    serve(); };
+  const off = e => { e.preventDefault(); held[key]=false; el.classList.remove('active'); };
+  el.addEventListener('touchstart',  on,  { passive:false });
+  el.addEventListener('touchend',    off, { passive:false });
+  el.addEventListener('touchcancel', off, { passive:false });
+  el.addEventListener('mousedown',   on);
+  el.addEventListener('mouseup',     off);
+  el.addEventListener('mouseleave',  off);
+}
+
+bindBtn('btn-p1-up','p1up');
+bindBtn('btn-p1-dn','p1dn');
+bindBtn('btn-p2-up','p2up');
+bindBtn('btn-p2-dn','p2dn');
+
+// ─────────────────────────────────────────────────────────────
+// INPUT — DRAG on play area (finger follows paddle)
+// ─────────────────────────────────────────────────────────────
+// Track active touches per zone: touchId → lastY
+const dragP1 = new Map(); // touchId → lastY
+const dragP2 = new Map();
+
+function getCanvasY(clientY) {
+  const rect = canvas.getBoundingClientRect();
+  return (clientY - rect.top) * (canvas.height / rect.height);
+}
+
+function setupDragZone(zone, dragMap, getPaddle) {
+  zone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    serve();
+    for (const t of e.changedTouches) {
+      dragMap.set(t.identifier, getCanvasY(t.clientY));
+    }
+  }, { passive:false });
+
+  zone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (!dragMap.has(t.identifier)) continue;
+      const prevY = dragMap.get(t.identifier);
+      const currY = getCanvasY(t.clientY);
+      const delta = currY - prevY;
+      const pad   = getPaddle();
+      if (pad) {
+        pad.y = clamp(pad.y + delta, 0, canvas.height - pad.h);
+      }
+      dragMap.set(t.identifier, currY);
+    }
+  }, { passive:false });
+
+  zone.addEventListener('touchend', e => {
+    for (const t of e.changedTouches) dragMap.delete(t.identifier);
+  }, { passive:false });
+
+  zone.addEventListener('touchcancel', e => {
+    for (const t of e.changedTouches) dragMap.delete(t.identifier);
+  }, { passive:false });
+}
+
+setupDragZone(zoneP1, dragP1, () => p1);
+setupDragZone(zoneP2, dragP2, () => mode==='2p' ? p2 : null);
+
+// ─────────────────────────────────────────────────────────────
+// SERVE
+// ─────────────────────────────────────────────────────────────
+function serve() {
+  if (!running || !waiting) return;
+  waiting = false;
+  statusEl.textContent = mode==='ai'
+    ? 'Buttons ▲▼ or drag left side'
+    : 'P1: left side  |  P2: right side';
+}
+
+// ─────────────────────────────────────────────────────────────
+// GAME LOOP
+// ─────────────────────────────────────────────────────────────
 let lastTs = 0;
 
-function loop(ts = 0) {
-  if (!gameRunning) return;
-  const dt = Math.min((ts - lastTs) / 16.67, 3); // cap delta
+function loop(ts=0) {
+  if (!running) return;
+  const dt = Math.min((ts - lastTs) / 16.67, 3);
   lastTs = ts;
-
   if (!waiting) update(dt);
   draw();
   rafId = requestAnimationFrame(loop);
 }
 
-// ── UPDATE ────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// UPDATE
+// ─────────────────────────────────────────────────────────────
 function update(dt) {
   const W = canvas.width, H = canvas.height;
-  const spd = PADDLE_SPEED * (W / 400) * dt;
+  const spd = Math.max(4, W * 0.012) * dt;
 
-  // P1 movement
-  if (keys['w'] || keys['arrowup'] && mode === '2p' || touchKeys['p1up']) p1.y -= spd;
-  if (keys['s'] || keys['arrowdown'] && mode === '2p' || touchKeys['p1dn']) p1.y += spd;
-  // In 2P, arrow keys for P1 too; in AI mode arrow keys also move p1
-  if (mode === 'ai') {
-    if (keys['arrowup'])   p1.y -= spd;
-    if (keys['arrowdown']) p1.y += spd;
-  } else {
-    if (keys['arrowup'])   p2.y -= spd;
-    if (keys['arrowdown']) p2.y += spd;
-    if (touchKeys['p2up']) p2.y -= spd;
-    if (touchKeys['p2dn']) p2.y += spd;
-  }
-
+  // P1 buttons
+  if (held.p1up) p1.y -= spd;
+  if (held.p1dn) p1.y += spd;
   p1.y = clamp(p1.y, 0, H - p1.h);
-  p2.y = clamp(p2.y, 0, H - p2.h);
 
-  // AI
-  if (mode === 'ai') {
-    const aiSpd = AI_SPEEDS[difficulty] * (W / 400) * dt;
-    const target = ball.y - p2.h / 2 + (Math.random() - .5) * H * AI_ERRS[difficulty];
-    if (p2.y + p2.h / 2 < target) p2.y = Math.min(p2.y + aiSpd, target);
-    else p2.y = Math.max(p2.y - aiSpd, target);
+  // P2 buttons (2P only) — drag is handled live in touchmove
+  if (mode === '2p') {
+    if (held.p2up) p2.y -= spd;
+    if (held.p2dn) p2.y += spd;
+    p2.y = clamp(p2.y, 0, H - p2.h);
+  } else {
+    // AI
+    const aiSpd = AI_SPD[difficulty] * (W/360) * dt;
+    const target = ball.y - p2.h/2 + (Math.random()-.5) * H * AI_ERR[difficulty];
+    p2.y += clamp(target - p2.y, -aiSpd, aiSpd);
     p2.y = clamp(p2.y, 0, H - p2.h);
   }
 
   // Ball trail
-  ball.trail.push({ x: ball.x, y: ball.y });
-  if (ball.trail.length > 8) ball.trail.shift();
+  ball.trail.push({ x:ball.x, y:ball.y });
+  if (ball.trail.length > 7) ball.trail.shift();
 
   // Move ball
   ball.x += ball.vx * dt;
   ball.y += ball.vy * dt;
 
-  // Top / bottom bounce
-  if (ball.y - ball.r < 0)      { ball.y = ball.r;      ball.vy = Math.abs(ball.vy); }
-  if (ball.y + ball.r > H)      { ball.y = H - ball.r;  ball.vy = -Math.abs(ball.vy); }
+  // Wall bounce
+  if (ball.y - ball.r < 0)  { ball.y = ball.r;      ball.vy =  Math.abs(ball.vy); }
+  if (ball.y + ball.r > H)  { ball.y = H - ball.r;  ball.vy = -Math.abs(ball.vy); }
 
   // Paddle collisions
-  if (hitPaddle(ball, p1, 'left'))  bounceBall('left');
-  if (hitPaddle(ball, p2, 'right')) bounceBall('right');
+  if (ball.vx < 0 && hits(ball, p1)) bounce(p1, 'right');
+  if (ball.vx > 0 && hits(ball, p2)) bounce(p2, 'left');
 
   // Score
-  if (ball.x - ball.r < 0) { point(1); return; }
-  if (ball.x + ball.r > W) { point(0); return; }
+  if (ball.x + ball.r < 0) { addPoint(1); return; }
+  if (ball.x - ball.r > W) { addPoint(0); return; }
 }
 
-function hitPaddle(b, p, side) {
-  const hit = b.x - b.r < p.x + p.w &&
-              b.x + b.r > p.x &&
-              b.y > p.y && b.y < p.y + p.h;
-  if (!hit) return false;
-  // only trigger when moving toward paddle
-  if (side === 'left'  && b.vx > 0) return false;
-  if (side === 'right' && b.vx < 0) return false;
-  return true;
+function hits(b, p) {
+  return b.x - b.r < p.x + p.w &&
+         b.x + b.r > p.x &&
+         b.y       > p.y &&
+         b.y       < p.y + p.h;
 }
 
-function bounceBall(side) {
-  const W = canvas.width, H = canvas.height;
-  const paddle = side === 'left' ? p1 : p2;
-  // Angle based on where ball hits paddle
-  const hitPos = (ball.y - (paddle.y + paddle.h / 2)) / (paddle.h / 2);
-  const maxAngle = Math.PI / 3.5;
-  const angle = hitPos * maxAngle;
-  const speed = Math.min(Math.hypot(ball.vx, ball.vy) * 1.045, W * 0.016);
-  ball.vx = (side === 'left' ? 1 : -1) * speed * Math.cos(angle);
-  ball.vy = speed * Math.sin(angle);
+function bounce(pad, dir) {
+  const rel = (ball.y - (pad.y + pad.h/2)) / (pad.h/2);
+  const ang = rel * (Math.PI/3.2);
+  const spd = Math.min(Math.hypot(ball.vx, ball.vy) * 1.05, canvas.width * 0.016);
+  ball.vx = (dir==='right' ? 1 : -1) * spd * Math.cos(ang);
+  ball.vy = spd * Math.sin(ang);
 }
 
-function point(scorer) {
-  scores[scorer]++;
+function addPoint(who) {
+  scores[who]++;
   updateHUD();
-  if (scores[scorer] >= WIN_SCORE) {
-    endGame(scorer);
-    return;
-  }
-  // Flash effect
-  document.getElementById('status-bar').textContent = 'Tap or press Space to serve';
-  resetBall();
+  if (scores[who] >= WIN) { endGame(who); return; }
+  spawnBall();
 }
 
-function endGame(winner) {
-  gameRunning = false;
-  const name = winner === 0 ? 'Player 1' : (mode === 'ai' ? 'Computer' : 'Player 2');
-  const color = winner === 0 ? '#00f5d4' : '#f72585';
-  const title = document.getElementById('overlay-title');
-  title.textContent = name + ' wins!';
-  title.style.color = color;
-  document.getElementById('overlay-sub').textContent = `${scores[0]} – ${scores[1]}`;
-  document.getElementById('overlay').style.display = 'flex';
+function endGame(who) {
+  running = false;
+  const name  = who===0 ? 'Player 1' : (mode==='ai' ? 'Computer' : 'Player 2');
+  const color = who===0 ? 'var(--c1)' : 'var(--c2)';
+  const t = document.getElementById('win-title');
+  t.textContent = name + ' Wins!';
+  t.style.color = color;
+  document.getElementById('win-score').textContent = `${scores[0]} – ${scores[1]}`;
+  document.getElementById('win-overlay').classList.add('active');
 }
 
-// ── DRAW ──────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// DRAW
+// ─────────────────────────────────────────────────────────────
 function draw() {
   const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0,0,W,H);
 
-  // Court lines
-  ctx.setLineDash([H * 0.04, H * 0.04]);
-  ctx.strokeStyle = '#1e1e3a';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+  // Net
+  ctx.setLineDash([H*.045, H*.04]);
+  ctx.strokeStyle='#1e1e3a'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Center circle
-  ctx.strokeStyle = '#1e1e3a';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.arc(W/2, H/2, H*0.12, 0, Math.PI*2); ctx.stroke();
+  // Centre circle
+  ctx.strokeStyle='#181830'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(W/2,H/2,H*.1,0,Math.PI*2); ctx.stroke();
 
-  // Ball trail
-  ball.trail.forEach((pt, i) => {
-    const alpha = (i / ball.trail.length) * 0.3;
-    const r = ball.r * (i / ball.trail.length) * 0.8;
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, r, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(0,245,212,${alpha})`;
-    ctx.fill();
+  // Trail
+  ball.trail.forEach((pt,i) => {
+    const a = (i/ball.trail.length)*.28;
+    const r = ball.r*(i/ball.trail.length)*.75;
+    ctx.beginPath(); ctx.arc(pt.x,pt.y,r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,245,212,${a})`; ctx.fill();
   });
 
   // Ball
-  const grad = ctx.createRadialGradient(ball.x - ball.r*0.3, ball.y - ball.r*0.3, ball.r*0.1, ball.x, ball.y, ball.r);
-  grad.addColorStop(0, '#fff');
-  grad.addColorStop(1, '#00f5d4');
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-  ctx.fillStyle = grad;
-  ctx.shadowColor = '#00f5d4';
-  ctx.shadowBlur = 18;
-  ctx.fill();
-  ctx.shadowBlur = 0;
+  const g = ctx.createRadialGradient(ball.x-ball.r*.3,ball.y-ball.r*.3,ball.r*.08,ball.x,ball.y,ball.r);
+  g.addColorStop(0,'#ffffff'); g.addColorStop(1,'#00f5d4');
+  ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);
+  ctx.fillStyle=g; ctx.shadowColor='#00f5d4'; ctx.shadowBlur=20;
+  ctx.fill(); ctx.shadowBlur=0;
 
   // Paddles
-  drawPaddle(p1, '#00f5d4', '#003d35');
-  drawPaddle(p2, '#f72585', '#3d0020');
+  drawPaddle(p1,'#00f5d4','#002e28');
+  drawPaddle(p2,'#f72585','#2e0018');
 
-  // Waiting overlay
+  // Serve overlay
   if (waiting) {
-    ctx.fillStyle = 'rgba(0,0,0,.45)';
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#00f5d4';
-    ctx.font = `bold ${W*0.04}px system-ui`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Tap to serve', W/2, H/2);
+    ctx.fillStyle='rgba(0,0,0,.52)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#00f5d4';
+    ctx.font=`bold ${Math.max(14,W*.042)}px system-ui`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Tap ▲▼ or drag to serve', W/2, H/2);
   }
 }
 
-function drawPaddle(p, color, bg) {
-  const r = p.w * 0.6;
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 14;
-  // bg glow
-  ctx.fillStyle = bg;
-  ctx.beginPath();
-  roundRect(ctx, p.x - 2, p.y - 2, p.w + 4, p.h + 4, r + 2);
-  ctx.fill();
-  // paddle
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  roundRect(ctx, p.x, p.y, p.w, p.h, r);
-  ctx.fill();
-  ctx.shadowBlur = 0;
+function drawPaddle(p, stroke, fill) {
+  const r = p.w*.55;
+  ctx.shadowColor=stroke; ctx.shadowBlur=16;
+  ctx.fillStyle=fill;
+  ctx.beginPath(); rrect(ctx,p.x-2,p.y-2,p.w+4,p.h+4,r+2); ctx.fill();
+  ctx.fillStyle=stroke;
+  ctx.beginPath(); rrect(ctx,p.x,p.y,p.w,p.h,r); ctx.fill();
+  ctx.shadowBlur=0;
 }
 
-function roundRect(c, x, y, w, h, r) {
-  c.moveTo(x + r, y);
-  c.lineTo(x + w - r, y);
-  c.quadraticCurveTo(x + w, y, x + w, y + r);
-  c.lineTo(x + w, y + h - r);
-  c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  c.lineTo(x + r, y + h);
-  c.quadraticCurveTo(x, y + h, x, y + h - r);
-  c.lineTo(x, y + r);
-  c.quadraticCurveTo(x, y, x + r, y);
+function rrect(c,x,y,w,h,r) {
+  c.moveTo(x+r,y); c.lineTo(x+w-r,y);
+  c.quadraticCurveTo(x+w,y,x+w,y+r); c.lineTo(x+w,y+h-r);
+  c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h);
+  c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r);
+  c.quadraticCurveTo(x,y,x+r,y);
 }
 
-function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
 
-// ── INPUT ─────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  keys[e.key.toLowerCase()] = true;
-  if (e.key === ' ' || e.key === 'Enter') serve();
-  if (['ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault();
+window.addEventListener('resize', () => {
+  if (running) { sizeCanvas(); }
 });
-document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-
-canvas.addEventListener('click', serve);
-canvas.addEventListener('touchstart', e => { e.preventDefault(); serve(); }, { passive: false });
-
-// Touch drag on canvas for P1 (finger swipe)
-let lastTouchY = null;
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  const t = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const scaleY = canvas.height / rect.height;
-  const ty = (t.clientY - rect.top) * scaleY;
-  if (t.clientX - rect.left < rect.width * 0.5) {
-    // Left half = P1
-    p1.y = clamp(ty - p1.h/2, 0, canvas.height - p1.h);
-  } else if (mode !== 'ai') {
-    p2.y = clamp(ty - p2.h/2, 0, canvas.height - p2.h);
-  }
-}, { passive: false });
-
-function serve() {
-  if (!gameRunning) return;
-  if (waiting) {
-    waiting = false;
-    document.getElementById('status-bar').textContent =
-      mode === 'ai' ? 'W/S or ↑↓ to move' : 'W/S ← P1   P2 → ↑↓';
-  }
-}
-
-// Touch buttons
-function bindTouchBtn(id, key) {
-  const el = document.getElementById(id);
-  const start = e => { e.preventDefault(); el.classList.add('pressed'); touchKeys[key] = true; };
-  const end   = e => { e.preventDefault(); el.classList.remove('pressed'); touchKeys[key] = false; };
-  el.addEventListener('touchstart', start, { passive: false });
-  el.addEventListener('touchend',   end,   { passive: false });
-  el.addEventListener('touchcancel',end,   { passive: false });
-  el.addEventListener('mousedown',  start);
-  el.addEventListener('mouseup',    end);
-  el.addEventListener('mouseleave', end);
-}
-
-bindTouchBtn('p1up', 'p1up');
-bindTouchBtn('p1dn', 'p1dn');
-bindTouchBtn('p2up', 'p2up');
-bindTouchBtn('p2dn', 'p2dn');
-
-window.addEventListener('resize', () => { if (gameRunning) resize(); });
 </script>
 </body>
 </html>
